@@ -3,9 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiPlus, FiCheck, FiTrash2, FiEdit2, FiX } from 'react-icons/fi';
 import { useCanvas } from '../../context/CanvasContext';
 
-const EnvironmentSidebar = () => {
+const EnvironmentSidebar = ({ selectedEnvironment = 'dev', onSelectEnvironment }) => {
   const { environments, currentProject, addEnvironment } = useCanvas();
-  const [selectedEnvironment, setSelectedEnvironment] = useState('dev');
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState('');
   const [newEnvironmentId, setNewEnvironmentId] = useState('');
@@ -50,7 +49,7 @@ const EnvironmentSidebar = () => {
             <motion.div
               key={env.id}
               whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
-              onClick={() => setSelectedEnvironment(env.id)}
+              onClick={() => onSelectEnvironment ? onSelectEnvironment(env.id) : null}
               className={`flex items-center justify-between p-2 rounded-md cursor-pointer group ${
                 env.id === selectedEnvironment ? 'bg-app-accent-purple bg-opacity-10' : ''
               }`}
