@@ -1,152 +1,77 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FiPlus, FiSettings, FiBell, FiChevronDown } from 'react-icons/fi';
+import { motion } from 'framer-motion';
+import { useRouter } from 'next/router';
+import { FiSearch, FiHelpCircle, FiBell, FiUser } from 'react-icons/fi';
 import { useCanvas } from '../context/CanvasContext';
 
 const Header = ({ projectView = false }) => {
+  const router = useRouter();
   const { currentProject } = useCanvas();
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
-    <header className="fixed top-0 left-0 right-0 bg-app-background border-b border-app-border h-16 z-30">
+    <header className="fixed top-0 left-0 right-0 h-16 bg-app-card border-b border-app-border z-50">
       <div className="flex items-center justify-between h-full px-4">
-        {/* Left side */}
-        <div className="flex items-center">
-          <Link href="/" className="text-app-text-primary mr-6">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center"
-            >
-              <svg viewBox="0 0 24 24" className="w-8 h-8 mr-2 text-app-text-primary" fill="currentColor">
-                <circle cx="12" cy="12" r="10" />
-              </svg>
-              {projectView ? (
-                <div className="flex items-center">
-                  <span className="text-app-text-primary font-medium">
-                    {currentProject?.name || 'perpetual-respect'}
-                  </span>
-                  <FiChevronDown className="ml-1 text-app-text-secondary" />
-                </div>
-              ) : (
-                <span className="text-app-text-primary font-medium">dhanush's Projects</span>
-              )}
-            </motion.div>
+        {/* Logo and navigation */}
+        <div className="flex items-center h-full">
+          <Link href="/" className="font-bold text-app-text-primary text-lg mr-8">
+            Canvas<span className="text-app-accent-purple">App</span>
           </Link>
           
-          {projectView && (
-            <div className="flex items-center space-x-6 text-app-text-secondary">
-              <div className="relative">
-                <span className="cursor-pointer hover:text-app-text-primary transition-colors font-medium">dev</span>
-                <FiChevronDown className="inline-block ml-1" />
-              </div>
-              <Link href="#" className="text-app-text-secondary hover:text-app-text-primary transition-colors">
-                Architecture
+          {projectView && currentProject && (
+            <div className="flex items-center h-full">
+              <Link href="/" className="text-app-text-secondary h-full flex items-center border-b-2 border-transparent">
+                Projects
               </Link>
-              <Link href="#" className="text-app-text-secondary hover:text-app-text-primary transition-colors">
-                Observability
-              </Link>
-              <Link href="#" className="text-app-text-secondary hover:text-app-text-primary transition-colors">
-                Logs
-              </Link>
-              <Link href="#" className="text-app-text-secondary hover:text-app-text-primary transition-colors">
-                Settings
-              </Link>
+              <span className="mx-2 text-app-text-secondary">/</span>
+              <span className="text-app-text-primary border-b-2 border-app-accent-purple h-full flex items-center">
+                {currentProject.name}
+              </span>
             </div>
           )}
         </div>
-
-        {/* Right side */}
-        <div className="flex items-center space-x-3">
-          {!projectView ? (
-            <>
-              <Link href="#" className="text-app-text-secondary hover:text-app-text-primary transition-colors">
-                Help
-              </Link>
-              <span className="text-app-text-secondary px-2 py-1 rounded-full bg-app-card">
-                d
-              </span>
-            </>
-          ) : (
-            <>
-              <span className="text-xs bg-app-badge-green text-app-badge-text-green px-2 py-0.5 rounded-full">
-                TRIAL
-              </span>
-              <span className="text-app-text-secondary">$ 4.99</span>
-              
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-app-button-secondary text-app-text-primary px-3 py-1.5 rounded-md"
-              >
-                Share
-              </motion.button>
-              
-              <span 
-                className="text-app-text-secondary bg-app-card p-1.5 rounded-full cursor-pointer hover:text-app-text-primary transition-colors"
-                onClick={() => setShowProfileMenu(!showProfileMenu)}
-              >
-                d
-              </span>
-              
-              {showProfileMenu && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute top-16 right-4 bg-app-card border border-app-border rounded-md shadow-lg z-50 w-64"
-                >
-                  <div className="p-4 border-b border-app-border">
-                    <div className="flex items-center">
-                      <span className="text-app-text-secondary bg-app-button-secondary p-2 rounded-full mr-3">d</span>
-                      <div>
-                        <p className="text-app-text-primary font-medium">dhanush</p>
-                        <p className="text-app-text-secondary text-sm">Workspace Owner</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="py-2">
-                    <a href="#" className="flex items-center px-4 py-2 hover:bg-app-card-hover text-app-text-secondary hover:text-app-text-primary transition-colors">
-                      <FiSettings className="mr-3" />
-                      <span>Account Settings</span>
-                    </a>
-                    <a href="#" className="flex items-center px-4 py-2 hover:bg-app-card-hover text-app-text-secondary hover:text-app-text-primary transition-colors">
-                      <FiSettings className="mr-3" />
-                      <span>Workspace Settings</span>
-                    </a>
-                    <a href="#" className="flex items-center px-4 py-2 hover:bg-app-card-hover text-app-text-secondary hover:text-app-text-primary transition-colors">
-                      <FiSettings className="mr-3" />
-                      <span>Project Usage</span>
-                    </a>
-                  </div>
-                </motion.div>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-      
-      {!projectView && (
-        <div className="flex items-center justify-between h-10 px-4 border-t border-app-border">
-          <div className="flex items-center space-x-6 text-sm">
-            <span className="text-xs bg-app-card text-app-text-secondary px-2 py-0.5 rounded-full">
-              TRIAL
-            </span>
-            <span className="text-app-text-secondary">$ 4.99</span>
-            <div className="text-app-text-secondary">
-              512 MB of RAM, 1 GB of Disk, and 2 vCPU
-            </div>
+        
+        {/* Search */}
+        <div className="flex-1 max-w-xl mx-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full bg-app-background border border-app-border rounded-md py-1.5 pl-9 pr-4 text-app-text-primary focus:outline-none focus:ring-1 focus:ring-app-accent-purple focus:border-app-accent-purple"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <FiSearch className="absolute left-3 top-2.5 text-app-text-secondary" />
           </div>
+        </div>
+        
+        {/* Right section */}
+        <div className="flex items-center space-x-4">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-app-text-secondary p-1.5 rounded-md hover:bg-app-background transition-colors duration-200"
+          >
+            <FiHelpCircle size={20} />
+          </motion.button>
           
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="bg-app-accent-purple text-white px-3 py-1 rounded-md text-sm"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-app-text-secondary p-1.5 rounded-md hover:bg-app-background transition-colors duration-200"
           >
-            Choose a Plan
+            <FiBell size={20} />
           </motion.button>
+          
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            className="h-8 w-8 bg-app-accent-purple rounded-full flex items-center justify-center text-white cursor-pointer"
+          >
+            <FiUser size={16} />
+          </motion.div>
         </div>
-      )}
+      </div>
     </header>
   );
 };

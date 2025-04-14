@@ -1,17 +1,22 @@
-import { ThemeProvider } from 'next-themes'
-import { AnimatePresence } from 'framer-motion'
-import Layout from '../components/Layout'
 import '../styles/globals.css'
+import { useState, useEffect } from 'react'
+import { AnimatePresence } from 'framer-motion'
+import { CanvasProvider } from '../context/CanvasContext'
 
 function MyApp({ Component, pageProps, router }) {
+  const [mounted, setMounted] = useState(false)
+
+  // Fix hydration issues
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
-    <ThemeProvider attribute="class" defaultTheme="light">
-      <Layout>
-        <AnimatePresence mode="wait" initial={false}>
-          <Component {...pageProps} key={router.pathname} />
-        </AnimatePresence>
-      </Layout>
-    </ThemeProvider>
+    <CanvasProvider>
+      <AnimatePresence mode="wait" initial={false}>
+        {mounted && <Component {...pageProps} key={router.pathname} />}
+      </AnimatePresence>
+    </CanvasProvider>
   )
 }
 

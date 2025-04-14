@@ -1,112 +1,83 @@
-import Head from 'next/head'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import Hero from '../components/Hero'
-import FeatureCard from '../components/FeatureCard'
-import { FiTarget, FiShield, FiTrendingUp, FiSmile } from 'react-icons/fi'
+import { useState } from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { FiGrid, FiList, FiPlus } from 'react-icons/fi';
+import { useCanvas } from '../context/CanvasContext';
+import ProjectCard from '../components/canvas/ProjectCard';
+import Header from '../components/Header';
 
 export default function Home() {
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        duration: 0.6
-      }
-    }
-  };
-
-  const features = [
-    {
-      icon: <FiTarget size={24} />,
-      title: "Precision & Accuracy",
-      description: "We deliver precise solutions tailored to your specific needs."
-    },
-    {
-      icon: <FiShield size={24} />,
-      title: "Secure & Reliable",
-      description: "Your data and infrastructure are protected with industry-leading security."
-    },
-    {
-      icon: <FiTrendingUp size={24} />,
-      title: "Scalable Growth",
-      description: "Our solutions scale with your business, supporting your growth journey."
-    },
-    {
-      icon: <FiSmile size={24} />,
-      title: "Client Satisfaction",
-      description: "We prioritize your satisfaction with responsive support and quality service."
-    }
-  ];
+  const { projects } = useCanvas();
+  const [viewType, setViewType] = useState('grid');
 
   return (
     <>
       <Head>
-        <title>Professional Multi-Page App</title>
+        <title>dhanush's Projects - Canvas App</title>
       </Head>
 
-      <Hero 
-        title="Innovative Solutions for Modern Business"
-        subtitle="Transform your digital presence with our cutting-edge technologies and expert services"
-        ctaText="Get Started"
-        ctaLink="/contact"
-      />
+      <div className="min-h-screen bg-app-background text-app-text-primary">
+        {/* Header */}
+        <Header />
 
-      <motion.section 
-        className="section container"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={{
-          hidden: {},
-          visible: {
-            transition: {
-              staggerChildren: 0.1
-            }
-          }
-        }}
-      >
-        <motion.div variants={fadeIn} className="text-center mb-12">
-          <h2 className="text-light-primary dark:text-dark-primary mb-4">Why Choose Us</h2>
-          <p className="max-w-2xl mx-auto">We combine innovation with expertise to deliver exceptional results that drive your business forward.</p>
-        </motion.div>
+        {/* Main content */}
+        <div className="container mx-auto pt-28 pb-16 px-4">
+          {/* Project header */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-lg font-medium text-app-text-primary">1 Project</h1>
+              
+              <div className="relative">
+                <button className="flex items-center text-app-text-secondary border-b border-dashed border-app-text-secondary">
+                  <span className="mr-2">Recent Activity</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, index) => (
-            <motion.div key={index} variants={fadeIn}>
-              <FeatureCard 
-                icon={feature.icon}
-                title={feature.title}
-                description={feature.description}
-              />
-            </motion.div>
-          ))}
-        </div>
-      </motion.section>
+            <div className="flex items-center space-x-2">
+              <div className="bg-app-card border border-app-border rounded-md overflow-hidden flex">
+                <button 
+                  className={`p-2 ${viewType === 'grid' ? 'bg-app-accent-purple text-white' : 'text-app-text-secondary'}`}
+                  onClick={() => setViewType('grid')}
+                >
+                  <FiGrid size={18} />
+                </button>
+                <button 
+                  className={`p-2 ${viewType === 'list' ? 'bg-app-accent-purple text-white' : 'text-app-text-secondary'}`}
+                  onClick={() => setViewType('list')}
+                >
+                  <FiList size={18} />
+                </button>
+              </div>
 
-      <motion.section 
-        className="section bg-light-primary dark:bg-dark-primary text-white"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={fadeIn}
-      >
-        <div className="container text-center">
-          <h2 className="mb-8">Ready to Transform Your Business?</h2>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-app-accent-purple text-white px-3 py-2 rounded-md flex items-center"
+              >
+                <FiPlus className="mr-2" />
+                <span>New</span>
+              </motion.button>
+            </div>
+          </div>
+
+          {/* Projects grid */}
           <motion.div 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className={`${viewType === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-4'}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
           >
-            <Link 
-              href="/contact" 
-              className="btn bg-light-secondary text-light-text dark:bg-dark-secondary dark:text-dark-background font-bold"
-            >
-              Contact Us Today
-            </Link>
+            {projects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
           </motion.div>
         </div>
-      </motion.section>
+      </div>
     </>
-  )
+  );
 }

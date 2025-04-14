@@ -2,9 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Canvas App Theme */
+  --app-background: #0f172a;
+  --app-card: #1e293b;
+  --app-card-hover: #334155;
+  --app-border: #334155;
+  --app-text-primary: #f8fafc;
+  --app-text-secondary: #94a3b8;
+  --app-accent-purple: #8b5cf6;
+}
+
 @layer base {
   body {
-    @apply bg-light-background text-light-text dark:bg-dark-background dark:text-dark-text;
+    @apply bg-app-background text-app-text-primary;
     transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
   }
   h1 {
@@ -40,22 +51,15 @@
   }
   
   .btn-primary {
-    @apply text-white bg-light-primary hover:bg-opacity-90 focus:ring-light-primary dark:bg-dark-primary dark:focus:ring-dark-primary;
+    @apply text-white bg-app-accent-purple hover:bg-opacity-90 focus:ring-app-accent-purple;
   }
   
   .btn-secondary {
-    @apply text-light-text bg-light-secondary hover:bg-opacity-90 focus:ring-light-secondary dark:text-dark-background dark:bg-dark-secondary dark:focus:ring-dark-secondary;
+    @apply text-app-text-primary bg-app-card hover:bg-app-card-hover focus:ring-app-border;
   }
   
-  .section {
-    @apply py-12 md:py-20;
-  }
-  
-  .link {
-    @apply text-light-accent hover:underline dark:text-dark-accent;
-  }
-  
-  .card {
-    @apply p-6 bg-white rounded-lg shadow-md dark:bg-dark-background dark:border dark:border-dark-primary;
+  .canvas-grid {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
   }
 }

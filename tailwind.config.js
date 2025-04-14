@@ -4,38 +4,17 @@ module.exports = {
     "./src/pages/**/*.{js,ts,jsx,tsx}",
     "./src/components/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        // Canvas app colors (dark mode based on images)
-        'app-background': '#0f0f18',
-        'app-card': '#1c1c27',
-        'app-card-hover': '#252532',
-        'app-accent-purple': '#6f42c1',
-        'app-accent-green': '#0dc373',
-        'app-text-primary': '#ffffff',
-        'app-text-secondary': '#9b9ba7',
-        'app-border': '#2a2a35',
-        'app-button-primary': '#6f42c1',
-        'app-button-secondary': '#2a2a35',
-        'app-badge-green': 'rgba(13, 195, 115, 0.15)',
-        'app-badge-text-green': '#0dc373',
-        'app-badge-purple': 'rgba(111, 66, 193, 0.15)',
-        'app-badge-text-purple': '#6f42c1',
-
-        // Original color scheme (keeping for reference)
-        'light-primary': '#4B0082', // Indigo
-        'light-secondary': '#FFD700', // Gold
-        'light-background': '#F8F9FA', // Soft White
-        'light-text': '#2C2C2C', // Dark Charcoal
-        'light-accent': '#0056B3', // Royal Blue
-        
-        'dark-primary': '#9370DB', // Medium Purple
-        'dark-secondary': '#FFD700', // Gold
-        'dark-background': '#121212', // Deep Black
-        'dark-text': '#EAEAEA', // Soft White
-        'dark-accent': '#1E90FF', // Bright Blue
+        // Canvas app theme colors
+        'app-background': 'var(--app-background)', // Dark blue
+        'app-card': 'var(--app-card)', // Slate dark
+        'app-card-hover': 'var(--app-card-hover)', // Lighter slate
+        'app-border': 'var(--app-border)', // Border color
+        'app-text-primary': 'var(--app-text-primary)', // White text
+        'app-text-secondary': 'var(--app-text-secondary)', // Gray text
+        'app-accent-purple': 'var(--app-accent-purple)', // Purple accent
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
