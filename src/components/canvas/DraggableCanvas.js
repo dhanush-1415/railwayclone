@@ -2,7 +2,6 @@ import { useState, useRef, useCallback } from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { motion } from 'framer-motion';
 import { useCanvas } from '../../context/CanvasContext';
-import ProjectCard from './ProjectCard';
 
 const DraggableCanvas = ({ children }) => {
   const { currentProject } = useCanvas();
@@ -66,6 +65,18 @@ const DraggableCanvas = ({ children }) => {
       variants={fadeIn}
       ref={canvasRef}
     >
+      {/* Canvas background pattern */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-70" 
+        style={{
+          backgroundSize: '40px 40px',
+          backgroundImage: `
+            radial-gradient(circle, rgba(255, 255, 255, 0.07) 1px, transparent 1px)
+          `,
+          backgroundPosition: '0 0',
+        }}
+      />
+    
       <TransformWrapper
         initialScale={1}
         initialPositionX={0}
@@ -82,14 +93,7 @@ const DraggableCanvas = ({ children }) => {
               contentClass="w-full h-full"
             >
               <div className="canvas-grid w-[3000px] h-[2000px] relative">
-                {/* Project card in the center */}
-                {currentProject && (
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    <ProjectCard project={currentProject} isCenter={true} />
-                  </div>
-                )}
-                
-                {/* Deployment cards and other elements */}
+                {/* Environment cards and other elements */}
                 {children}
               </div>
             </TransformComponent>

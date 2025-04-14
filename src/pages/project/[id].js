@@ -27,60 +27,52 @@ export default function ProjectDetail() {
     }
   }, [id, selectProject]);
 
-  // Filter deployments for selected environment
-  const filteredDeployments = deployments.filter(
-    (deployment) => deployment.environmentId === selectedEnvironmentId && deployment.projectId === id
-  );
+  // Get all environments for this project
+  const projectEnvironments = environments.map(env => {
+    // Create a deployment-like object for each environment
+    return {
+      id: env.id,
+      name: env.name,
+      environmentId: env.id,
+      projectId: id,
+      status: 'running'
+    };
+  });
 
-  // Handle adding new deployment
+  // Handle adding new environment (creating a deployment is now creating an environment)
   const handleAddDeployment = () => {
     if (newDeploymentName.trim() === '') return;
     
-    addDeployment({
+    // First add the environment
+    addEnvironment({
+      id: newDeploymentName.toLowerCase().replace(/\s+/g, '-'),
       name: newDeploymentName,
-      projectId: id,
-      environmentId: selectedEnvironmentId,
-      technology: newDeploymentTechnology,
-      status: 'running',
-      resourceUsage: { cpu: '0%', memory: '0MB' }
+      color: '#9c5cff'
     });
     
     setNewDeploymentName('');
     setDeployModalOpen(false);
   };
 
-  // Deployment positions - arrange in a circle around the center
+  // Environment box positions
   const getDeploymentPosition = (index, total) => {
     // Center of the canvas
-    const centerX = 1500;
-    const centerY = 1000;
+    const centerX = 900;
+    const centerY = 400;
     
+    // If only one environment, place it in the center
     if (total <= 1) {
-      // If only one deployment, place it to the right of the center
-      return { x: centerX + 300, y: centerY };
-    } else if (total === 2) {
-      // If two deployments, place them left and right of center
-      return index === 0 
-        ? { x: centerX - 300, y: centerY } 
-        : { x: centerX + 300, y: centerY };
-    } else if (total === 3) {
-      // If three deployments, arrange in a triangle
-      const angles = [0, 2*Math.PI/3, 4*Math.PI/3];
-      const angle = angles[index];
-      const radius = 300;
-      return {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle),
-      };
-    } else {
-      // For more than three, arrange in a circle
-      const angle = (index * (2 * Math.PI)) / total;
-      const radius = 350;
-      return {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle),
-      };
-    }
+      return { x: centerX, y: centerY };
+    } 
+    
+    // Place environments in a row
+    const boxWidth = 200; // width + margin
+    const startX = centerX - ((total - 1) * boxWidth) / 2;
+    
+    return {
+      x: startX + (index * boxWidth),
+      y: centerY
+    };
   };
 
   // If project not found or not loaded yet
@@ -132,18 +124,18 @@ export default function ProjectDetail() {
           {/* Canvas */}
           <div className="flex-1 relative">
             <DraggableCanvas>
-              {/* Deployments */}
-              {filteredDeployments.map((deployment, index) => (
+              {/* Environment boxes */}
+              {projectEnvironments.map((env, index) => (
                 <DeploymentCard
-                  key={deployment.id}
-                  deployment={deployment}
-                  position={getDeploymentPosition(index, filteredDeployments.length)}
+                  key={env.id}
+                  deployment={env}
+                  position={getDeploymentPosition(index, projectEnvironments.length)}
                 />
               ))}
             </DraggableCanvas>
             
-            {/* Empty state when no deployments */}
-            {filteredDeployments.length === 0 && (
+            {/* Empty state when no environments */}
+            {projectEnvironments.length === 0 && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
@@ -153,16 +145,16 @@ export default function ProjectDetail() {
                   <div className="inline-flex items-center justify-center h-14 w-14 bg-app-background rounded-full mb-4">
                     <FiPlus className="text-app-accent-purple" size={26} />
                   </div>
-                  <h3 className="text-xl font-medium text-app-text-primary mb-2">No deployments</h3>
+                  <h3 className="text-xl font-medium text-app-text-primary mb-2">No environments</h3>
                   <p className="text-app-text-secondary mb-6">
-                    Get started by creating your first deployment in the {selectedEnvironmentId} environment.
+                    Get started by creating your first environment for this project.
                   </p>
                   <button 
                     onClick={() => setDeployModalOpen(true)}
                     className="bg-app-accent-purple text-white px-4 py-2 rounded-md inline-flex items-center"
                   >
                     <FiPlus className="mr-2" />
-                    Create Deployment
+                    Create Environment
                   </button>
                 </motion.div>
               </div>
@@ -214,7 +206,7 @@ export default function ProjectDetail() {
               onClick={e => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-app-text-primary text-xl font-semibold">New Deployment</h3>
+                <h3 className="text-app-text-primary text-xl font-semibold">New Environment</h3>
                 <button 
                   onClick={() => setDeployModalOpen(false)}
                   className="text-app-text-secondary hover:text-app-text-primary transition-colors"
@@ -225,42 +217,39 @@ export default function ProjectDetail() {
               
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="deploymentName" className="block text-app-text-secondary text-sm mb-1">Name</label>
+                  <label htmlFor="environmentName" className="block text-app-text-secondary text-sm mb-1">Environment Name</label>
                   <input 
                     type="text" 
-                    id="deploymentName"
+                    id="environmentName"
                     value={newDeploymentName}
                     onChange={(e) => setNewDeploymentName(e.target.value)}
                     className="w-full bg-app-background border border-app-border rounded-md py-2 px-3 text-app-text-primary focus:outline-none focus:ring-1 focus:ring-app-accent-purple focus:border-app-accent-purple"
-                    placeholder="E.g. API Server"
+                    placeholder="E.g. Production"
                   />
                 </div>
                 <div>
-                  <label htmlFor="deploymentType" className="block text-app-text-secondary text-sm mb-1">Technology</label>
+                  <label htmlFor="environmentType" className="block text-app-text-secondary text-sm mb-1">Environment Type</label>
                   <select 
-                    id="deploymentType"
+                    id="environmentType"
                     value={newDeploymentTechnology}
                     onChange={(e) => setNewDeploymentTechnology(e.target.value)}
                     className="w-full bg-app-background border border-app-border rounded-md py-2 px-3 text-app-text-primary focus:outline-none focus:ring-1 focus:ring-app-accent-purple focus:border-app-accent-purple"
                   >
-                    <option value="Node.js">Node.js</option>
-                    <option value="PostgreSQL">PostgreSQL</option>
-                    <option value="React">React</option>
+                    <option value="Node.js">Development</option>
+                    <option value="PostgreSQL">Staging</option>
+                    <option value="React">Production</option>
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="environmentSelect" className="block text-app-text-secondary text-sm mb-1">Environment</label>
+                  <label htmlFor="environmentRegion" className="block text-app-text-secondary text-sm mb-1">Region</label>
                   <select 
-                    id="environmentSelect"
-                    value={selectedEnvironmentId}
-                    disabled
-                    className="w-full bg-app-background border border-app-border rounded-md py-2 px-3 text-app-text-primary focus:outline-none focus:ring-1 focus:ring-app-accent-purple focus:border-app-accent-purple opacity-70"
+                    id="environmentRegion"
+                    className="w-full bg-app-background border border-app-border rounded-md py-2 px-3 text-app-text-primary focus:outline-none focus:ring-1 focus:ring-app-accent-purple focus:border-app-accent-purple"
                   >
-                    {environments.map(env => (
-                      <option key={env.id} value={env.id}>{env.name}</option>
-                    ))}
+                    <option value="us-east">US East</option>
+                    <option value="us-west">US West</option>
+                    <option value="eu-central">EU Central</option>
                   </select>
-                  <p className="text-app-text-secondary text-xs mt-1">Using currently selected environment.</p>
                 </div>
               </div>
               <div className="flex justify-end space-x-3 mt-6">
@@ -275,7 +264,7 @@ export default function ProjectDetail() {
                   onClick={handleAddDeployment}
                   disabled={!newDeploymentName.trim()}
                 >
-                  Create Deployment
+                  Create Environment
                 </button>
               </div>
             </motion.div>
