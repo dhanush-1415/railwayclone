@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FiServer, FiDatabase, FiGlobe, FiCpu, FiHardDrive } from 'react-icons/fi';
 import Draggable from 'react-draggable';
@@ -7,6 +7,7 @@ import Xarrow from 'react-xarrows';
 const DeploymentCard = ({ deployment, position }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [pos, setPos] = useState(position);
+  const nodeRef = useRef(null); // Add this ref for React 18 compatibility
 
   // Get icon based on deployment type
   const getIcon = () => {
@@ -50,8 +51,10 @@ const DeploymentCard = ({ deployment, position }) => {
         onStart={() => setIsDragging(true)}
         onDrag={handleDrag}
         onStop={() => setIsDragging(false)}
+        nodeRef={nodeRef} // Add the ref to Draggable for React 18 compatibility
       >
         <motion.div
+          ref={nodeRef} // Reference the element
           id={`deployment-${deployment.id}`}
           className="bg-app-card border border-app-border rounded-lg shadow-md w-48 select-none absolute z-10"
           initial={{ scale: 0.8, opacity: 0 }}

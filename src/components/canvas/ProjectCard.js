@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FiDatabase, FiServer, FiGlobe, FiGitBranch, FiArrowRight } from 'react-icons/fi';
 import Link from 'next/link';
@@ -6,6 +6,7 @@ import Draggable from 'react-draggable';
 
 const ProjectCard = ({ project, isCenter = false }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const nodeRef = useRef(null); // Add this ref for React 18 compatibility
 
   // Card styles based on whether it's centered in the canvas or a list item
   const cardClasses = isCenter
@@ -20,8 +21,10 @@ const ProjectCard = ({ project, isCenter = false }) => {
         onStart={() => setIsDragging(true)}
         onStop={() => setIsDragging(false)}
         position={{ x: 0, y: 0 }}
+        nodeRef={nodeRef} // Add the ref to Draggable for React 18 compatibility
       >
         <motion.div 
+          ref={nodeRef} // Reference the element
           id="project-center"
           className={cardClasses}
           initial={{ scale: 0.95, opacity: 0 }}

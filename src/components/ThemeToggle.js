@@ -1,36 +1,21 @@
-import { useEffect, useState } from 'react'
-import { useTheme } from 'next-themes'
-import { FiSun, FiMoon } from 'react-icons/fi'
+import { motion } from 'framer-motion';
+import { FiSun, FiMoon } from 'react-icons/fi';
+import { useTheme } from '../context/ThemeContext';
 
-export default function ThemeToggle() {
-  const [mounted, setMounted] = useState(false)
-  const { theme, setTheme } = useTheme()
-
-  // After mounting, we can show the toggle
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return <div className="w-10 h-10"></div>
-  }
-
-  // Toggle the theme
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark')
-  }
-
+const ThemeToggle = () => {
+  const { theme, toggleTheme } = useTheme();
+  
   return (
-    <button
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
       onClick={toggleTheme}
-      className="w-10 h-10 rounded-full flex items-center justify-center transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+      className="bg-app-card border border-app-border rounded-md p-2 text-app-text-secondary hover:text-app-text-primary transition-colors"
       aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
     >
-      {theme === 'dark' ? (
-        <FiSun className="text-dark-text hover:text-dark-accent" size={20} />
-      ) : (
-        <FiMoon className="text-light-text hover:text-light-primary" size={20} />
-      )}
-    </button>
-  )
-}
+      {theme === 'dark' ? <FiSun size={18} /> : <FiMoon size={18} />}
+    </motion.button>
+  );
+};
+
+export default ThemeToggle;
