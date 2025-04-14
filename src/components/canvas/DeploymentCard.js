@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiGitBranch, FiServer, FiGlobe } from 'react-icons/fi';
 import Draggable from 'react-draggable';
@@ -7,6 +7,12 @@ const DeploymentCard = ({ deployment, position }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [pos, setPos] = useState(position);
   const nodeRef = useRef(null); // Add this ref for React 18 compatibility
+
+  // Set position on mount only
+  useEffect(() => {
+    setPos(position);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle drag events
   const handleDrag = (e, data) => {
@@ -17,6 +23,7 @@ const DeploymentCard = ({ deployment, position }) => {
     <Draggable
       bounds="parent"
       position={pos}
+      defaultPosition={position}
       onStart={() => setIsDragging(true)}
       onDrag={handleDrag}
       onStop={() => setIsDragging(false)}
@@ -25,14 +32,14 @@ const DeploymentCard = ({ deployment, position }) => {
       <motion.div
         ref={nodeRef} // Reference the element
         id={`environment-${deployment.id}`}
-        className="bg-app-card border border-app-border rounded-lg shadow-md w-48 select-none absolute z-10"
+        className={`bg-app-card border border-app-border rounded-lg shadow-md w-48 select-none absolute z-10 cursor-move ${isDragging ? 'shadow-lg' : ''}`}
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.3 }}
         whileHover={{ boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
       >
         {/* Card header */}
-        <div className="p-3 flex items-center">
+        <div className="p-3 flex items-center border-b border-app-border">
           <div className="h-8 w-8 flex-shrink-0 rounded-md bg-app-background text-app-accent-purple flex items-center justify-center mr-3">
             <FiGitBranch size={18} />
           </div>
@@ -51,7 +58,7 @@ const DeploymentCard = ({ deployment, position }) => {
             <span className="text-xs text-green-500 font-medium">Healthy</span>
           </div>
           <div className="mt-1 text-xs text-app-text-secondary">
-            Updated {Math.floor(Math.random() * 12) + 1} hours ago
+            Updated 8 hours ago
           </div>
         </div>
         

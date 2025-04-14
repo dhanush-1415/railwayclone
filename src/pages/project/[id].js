@@ -54,20 +54,21 @@ export default function ProjectDetail() {
     setDeployModalOpen(false);
   };
 
-  // Environment box positions
+  // Environment box positions - explicitly position each environment
   const getDeploymentPosition = (index, total) => {
     // Center of the canvas
-    const centerX = 900;
-    const centerY = 400;
+    const centerX = 1000;
+    const centerY = 500;
     
     // If only one environment, place it in the center
     if (total <= 1) {
       return { x: centerX, y: centerY };
-    } 
+    }
     
-    // Place environments in a row
-    const boxWidth = 200; // width + margin
-    const startX = centerX - ((total - 1) * boxWidth) / 2;
+    // For multiple environments, arrange in a horizontal line with spacing
+    const boxWidth = 250; // width + margin between boxes
+    const totalWidth = (total - 1) * boxWidth;
+    const startX = centerX - (totalWidth / 2);
     
     return {
       x: startX + (index * boxWidth),

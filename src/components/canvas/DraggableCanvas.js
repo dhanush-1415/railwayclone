@@ -65,26 +65,18 @@ const DraggableCanvas = ({ children }) => {
       variants={fadeIn}
       ref={canvasRef}
     >
-      {/* Canvas background pattern */}
-      <div 
-        className="absolute inset-0 pointer-events-none opacity-70" 
-        style={{
-          backgroundSize: '40px 40px',
-          backgroundImage: `
-            radial-gradient(circle, rgba(255, 255, 255, 0.07) 1px, transparent 1px)
-          `,
-          backgroundPosition: '0 0',
-        }}
-      />
+
     
       <TransformWrapper
-        initialScale={1}
+        initialScale={0.7}
         initialPositionX={0}
         initialPositionY={0}
-        minScale={0.5}
+        minScale={0.3}
         maxScale={2}
         limitToBounds={false}
         centerOnInit={true}
+        alignmentAnimation={{ sizeX: 0, sizeY: 0 }}
+        panning={{ velocityDisabled: false }}
       >
         {(utils) => (
           <>
@@ -92,7 +84,12 @@ const DraggableCanvas = ({ children }) => {
               wrapperClass="w-full h-full" 
               contentClass="w-full h-full"
             >
-              <div className="canvas-grid w-[3000px] h-[2000px] relative">
+              <div className="canvas-grid w-[3000px] h-[2000px] relative" 
+                style={{ 
+                  backgroundImage: `radial-gradient(circle, rgba(255, 255, 255, 0.07) 1px, transparent 1px)`,
+                  backgroundSize: '25px 25px', 
+                  backgroundPosition: '0 0'
+                }}>
                 {/* Environment cards and other elements */}
                 {children}
               </div>
