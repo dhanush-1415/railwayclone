@@ -14,7 +14,7 @@ import { useCanvas } from '../../context/CanvasContext';
 export default function ProjectDetail() {
   const router = useRouter();
   const { id } = router.query;
-  const { deployments, selectProject, currentProject, environments, addDeployment, addEnvironment } = useCanvas();
+  const { deployments, selectProject, currentProject, environments, addDeployment } = useCanvas();
   const [selectedEnvironmentId, setSelectedEnvironmentId] = useState('dev');
   const [deployModalOpen, setDeployModalOpen] = useState(false);
   const [newDeploymentName, setNewDeploymentName] = useState('');
@@ -57,50 +57,22 @@ export default function ProjectDetail() {
   // Environment box positions
   const getDeploymentPosition = (index, total) => {
     // Center of the canvas
-    const centerX = 1800; // Middle of the 4000px wide canvas
-    const centerY = 1000; // Middle of the 3000px high canvas
+    const centerX = 900;
+    const centerY = 400;
     
     // If only one environment, place it in the center
     if (total <= 1) {
       return { x: centerX, y: centerY };
     } 
     
-    // Place environments in a row with more spacing
-    const boxWidth = 300; // Width + margin between cards
+    // Place environments in a row
+    const boxWidth = 200; // width + margin
+    const startX = centerX - ((total - 1) * boxWidth) / 2;
     
-    if (total === 2) {
-      // For 2 environments, place on opposite sides of center
-      return index === 0 
-        ? { x: centerX - 200, y: centerY }
-        : { x: centerX + 200, y: centerY };
-    } else if (total === 3) {
-      // For 3 environments, place in a triangle
-      const radius = 300;
-      const angleStep = (2 * Math.PI) / 3;
-      const angle = index * angleStep;
-      
-      return {
-        x: centerX + Math.cos(angle) * radius,
-        y: centerY + Math.sin(angle) * radius
-      };
-    } else if (total <= 6) {
-      // For 4-6 environments, place in a horizontal row
-      const startX = centerX - ((total - 1) * boxWidth) / 2;
-      return {
-        x: startX + (index * boxWidth),
-        y: centerY
-      };
-    } else {
-      // For more than 6, arrange in a circle
-      const radius = 400;
-      const angleStep = (2 * Math.PI) / total;
-      const angle = index * angleStep;
-      
-      return {
-        x: centerX + Math.cos(angle) * radius,
-        y: centerY + Math.sin(angle) * radius
-      };
-    }
+    return {
+      x: startX + (index * boxWidth),
+      y: centerY
+    };
   };
 
   // If project not found or not loaded yet
@@ -137,73 +109,82 @@ export default function ProjectDetail() {
         <meta name="description" content={`Details for ${currentProject?.name} - Canvas App`} />
       </Head>
 
-      <div className="h-screen w-full bg-app-background text-app-text-primary overflow-hidden">
-        {/* Full screen canvas */}
-        <DraggableCanvas>
-          {/* Environment boxes */}
-          {projectEnvironments.map((env, index) => (
-            <DeploymentCard
-              key={env.id}
-              deployment={env}
-              position={getDeploymentPosition(index, projectEnvironments.length)}
-            />
-          ))}
-        </DraggableCanvas>
+      <div className="flex flex-col h-screen bg-app-background text-app-text-primary">
+        {/* Header */}
+        <Header projectView={true} />
         
-        {/* Empty state when no environments */}
-        {projectEnvironments.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-app-card border border-app-border rounded-lg p-8 max-w-md text-center pointer-events-auto shadow-xl"
-            >
-              <div className="inline-flex items-center justify-center h-16 w-16 bg-app-background rounded-full mb-4">
-                <FiPlus className="text-app-accent-purple" size={30} />
+        {/* Main content */}
+        <div className="flex flex-1 mt-16 relative">
+          {/* Environment sidebar */}
+          <EnvironmentSidebar 
+            selectedEnvironment={selectedEnvironmentId} 
+            onSelectEnvironment={setSelectedEnvironmentId} 
+          />
+          
+          {/* Canvas */}
+          <div className="flex-1 relative">
+            <DraggableCanvas>
+              {/* Environment boxes */}
+              {projectEnvironments.map((env, index) => (
+                <DeploymentCard
+                  key={env.id}
+                  deployment={env}
+                  position={getDeploymentPosition(index, projectEnvironments.length)}
+                />
+              ))}
+            </DraggableCanvas>
+            
+            {/* Empty state when no environments */}
+            {projectEnvironments.length === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-app-card border border-app-border rounded-lg p-8 max-w-md text-center pointer-events-auto"
+                >
+                  <div className="inline-flex items-center justify-center h-14 w-14 bg-app-background rounded-full mb-4">
+                    <FiPlus className="text-app-accent-purple" size={26} />
+                  </div>
+                  <h3 className="text-xl font-medium text-app-text-primary mb-2">No environments</h3>
+                  <p className="text-app-text-secondary mb-6">
+                    Get started by creating your first environment for this project.
+                  </p>
+                  <button 
+                    onClick={() => setDeployModalOpen(true)}
+                    className="bg-app-accent-purple text-white px-4 py-2 rounded-md inline-flex items-center"
+                  >
+                    <FiPlus className="mr-2" />
+                    Create Environment
+                  </button>
+                </motion.div>
               </div>
-              <h3 className="text-xl font-medium text-app-text-primary mb-2">No environments</h3>
-              <p className="text-app-text-secondary mb-6">
-                Get started by creating your first environment for this project.
-              </p>
-              <button 
-                onClick={() => setDeployModalOpen(true)}
-                className="bg-app-accent-purple text-white px-4 py-2 rounded-md inline-flex items-center"
-              >
-                <FiPlus className="mr-2" />
-                Create Environment
-              </button>
-            </motion.div>
+            )}
+            
+            {/* Footer Info */}
+            <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-app-background border-t border-app-border text-app-text-secondary text-sm flex justify-between items-center">
+              <div className="flex items-center">
+                <span className="bg-green-500 h-2 w-2 rounded-full mr-2"></span>
+                <span>All systems operational</span>
+              </div>
+              <div className="flex items-center">
+                <button className="flex items-center hover:text-app-text-primary transition-colors">
+                  <span className="mr-2">Activity Log</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
-        )}
-        
-        {/* Floating action button */}
-        <div className="absolute left-8 bottom-8 z-40">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setDeployModalOpen(true)}
-            className="flex items-center space-x-2 bg-app-accent-purple text-white px-4 py-3 rounded-md shadow-lg hover:bg-opacity-90 transition-all duration-200"
-          >
-            <FiPlus size={20} />
-            <span>New Environment</span>
-          </motion.button>
         </div>
+
+        {/* Action buttons */}
+        <ProjectActionButtons 
+          onCreateDeployment={() => setDeployModalOpen(true)}
+        />
         
-        {/* Floating home button */}
-        <div className="absolute top-8 left-8 z-40">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => router.push('/')}
-            className="bg-app-card border border-app-border text-app-text-primary px-4 py-3 rounded-md shadow-lg hover:border-app-accent-purple transition-colors duration-200 flex items-center space-x-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-            <span>Projects</span>
-          </motion.button>
-        </div>
+        {/* Toolbar */}
+        <CanvasToolbar />
       </div>
 
       {/* Create Deployment Modal */}
