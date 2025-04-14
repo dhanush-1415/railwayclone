@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { motion } from 'framer-motion';
 import { useCanvas } from '../../context/CanvasContext';
@@ -6,6 +6,22 @@ import { useCanvas } from '../../context/CanvasContext';
 const DraggableCanvas = ({ children }) => {
   const { currentProject } = useCanvas();
   const canvasRef = useRef(null);
+  const [canvasSize, setCanvasSize] = useState({ width: 4000, height: 3000 });
+  
+  // Auto-center the canvas on initial load
+  useEffect(() => {
+    // Initial centering of the canvas
+    const timer = setTimeout(() => {
+      const wrapperElement = document.querySelector('.react-transform-wrapper');
+      if (wrapperElement) {
+        wrapperElement.style.display = 'flex';
+        wrapperElement.style.justifyContent = 'center';
+        wrapperElement.style.alignItems = 'center';
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Animation settings
   const fadeIn = {
@@ -64,33 +80,31 @@ const DraggableCanvas = ({ children }) => {
       animate="visible"
       variants={fadeIn}
       ref={canvasRef}
-    >
-
-    
+    >    
       <TransformWrapper
         initialScale={0.7}
-        initialPositionX={0}
-        initialPositionY={0}
         minScale={0.3}
         maxScale={2}
         limitToBounds={false}
         centerOnInit={true}
-        alignmentAnimation={{ sizeX: 0, sizeY: 0 }}
-        panning={{ velocityDisabled: false }}
+        wheel={{ step: 0.05 }}
       >
         {(utils) => (
           <>
-            <TransformComponent 
-              wrapperClass="w-full h-full" 
-              contentClass="w-full h-full"
+            <TransformComponent
+              wrapperStyle={{ width: '100%', height: '100%' }}
             >
-              <div className="canvas-grid w-[3000px] h-[2000px] relative" 
+              <div 
+                className="w-full h-full" 
                 style={{ 
+                  width: canvasSize.width,
+                  height: canvasSize.height,
                   backgroundImage: `radial-gradient(circle, rgba(255, 255, 255, 0.07) 1px, transparent 1px)`,
-                  backgroundSize: '25px 25px', 
+                  backgroundSize: '25px 25px',
                   backgroundPosition: '0 0'
-                }}>
-                {/* Environment cards and other elements */}
+                }}
+              >
+                {/* Environment boxes */}
                 {children}
               </div>
             </TransformComponent>

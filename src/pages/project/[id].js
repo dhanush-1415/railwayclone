@@ -14,7 +14,7 @@ import { useCanvas } from '../../context/CanvasContext';
 export default function ProjectDetail() {
   const router = useRouter();
   const { id } = router.query;
-  const { deployments, selectProject, currentProject, environments, addDeployment } = useCanvas();
+  const { deployments, selectProject, currentProject, environments, addDeployment, addEnvironment } = useCanvas();
   const [selectedEnvironmentId, setSelectedEnvironmentId] = useState('dev');
   const [deployModalOpen, setDeployModalOpen] = useState(false);
   const [newDeploymentName, setNewDeploymentName] = useState('');
@@ -56,9 +56,9 @@ export default function ProjectDetail() {
 
   // Environment box positions - explicitly position each environment
   const getDeploymentPosition = (index, total) => {
-    // Center of the canvas
-    const centerX = 1000;
-    const centerY = 500;
+    // Center of the canvas (using the larger canvas dimensions - see DraggableCanvas)
+    const centerX = 2000; // Center of 4000px canvas
+    const centerY = 1500; // Center of 3000px canvas
     
     // If only one environment, place it in the center
     if (total <= 1) {
@@ -122,8 +122,8 @@ export default function ProjectDetail() {
             onSelectEnvironment={setSelectedEnvironmentId} 
           />
           
-          {/* Canvas */}
-          <div className="flex-1 relative">
+          {/* Canvas - Full width and height */}
+          <div className="flex-1 relative overflow-hidden">
             <DraggableCanvas>
               {/* Environment boxes */}
               {projectEnvironments.map((env, index) => (
