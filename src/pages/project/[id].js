@@ -1,12 +1,290 @@
+// import { useEffect, useState } from 'react';
+// import { useRouter } from 'next/router';
+// import Head from 'next/head';
+// import { motion, AnimatePresence } from 'framer-motion';
+// import { FiPlus, FiMoreVertical, FiTrash2, FiX } from 'react-icons/fi';
+// import DraggableCanvas from '../../components/canvas/DraggableCanvas';
+// import Header from '../../components/Header';
+// import DeploymentCard from '../../components/canvas/DeploymentCard';
+// import EnvironmentSidebar from '../../components/canvas/EnvironmentSidebar';
+// import CanvasToolbar from '../../components/canvas/CanvasToolbar';
+// import ProjectActionButtons from '../../components/canvas/ProjectActionButtons';
+// import { useCanvas } from '../../context/CanvasContext';
+
+// export default function ProjectDetail() {
+//   const router = useRouter();
+//   const { id } = router.query;
+//   const { deployments, selectProject, currentProject, environments, addDeployment, addEnvironment } = useCanvas();
+//   const [selectedEnvironmentId, setSelectedEnvironmentId] = useState('dev');
+//   const [deployModalOpen, setDeployModalOpen] = useState(false);
+//   const [newDeploymentName, setNewDeploymentName] = useState('');
+//   const [newDeploymentTechnology, setNewDeploymentTechnology] = useState('Node.js');
+
+//   // Select current project when ID changes
+//   useEffect(() => {
+//     if (id) {
+//       selectProject(id);
+//     }
+//   }, [id, selectProject]);
+
+//   // Get all environments for this project
+//   const projectEnvironments = environments.map(env => {
+//     // Create a deployment-like object for each environment
+//     return {
+//       id: env.id,
+//       name: env.name,
+//       environmentId: env.id,
+//       projectId: id,
+//       status: 'running'
+//     };
+//   });
+
+//   // Handle adding new environment (creating a deployment is now creating an environment)
+//   const handleAddDeployment = () => {
+//     if (newDeploymentName.trim() === '') return;
+    
+//     // First add the environment
+//     addEnvironment({
+//       id: newDeploymentName.toLowerCase().replace(/\s+/g, '-'),
+//       name: newDeploymentName,
+//       color: '#9c5cff'
+//     });
+    
+//     setNewDeploymentName('');
+//     setDeployModalOpen(false);
+//   };
+
+//   // Environment box positions - explicitly position each environment
+//   const getDeploymentPosition = (index, total) => {
+//     // Center of the canvas (using the larger canvas dimensions - see DraggableCanvas)
+//     const centerX = 2000; // Center of 4000px canvas
+//     const centerY = 1500; // Center of 3000px canvas
+    
+//     // If only one environment, place it in the center
+//     if (total <= 1) {
+//       return { x: centerX, y: centerY };
+//     }
+    
+//     // For multiple environments, arrange in a horizontal line with spacing
+//     const boxWidth = 250; // width + margin between boxes
+//     const totalWidth = (total - 1) * boxWidth;
+//     const startX = centerX - (totalWidth / 2);
+    
+//     return {
+//       x: startX + (index * boxWidth),
+//       y: centerY
+//     };
+//   };
+
+//   // If project not found or not loaded yet
+//   if (!currentProject) {
+//     return (
+//       <div className="flex flex-col h-screen items-center justify-center bg-app-background text-app-text-primary">
+//         <motion.div
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: 1 }}
+//           className="text-center"
+//         >
+//           <div className="mb-4 text-app-text-secondary">
+//             <svg className="w-16 h-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+//             </svg>
+//           </div>
+//           <h1 className="text-xl font-semibold mb-2">Project not found</h1>
+//           <p className="text-app-text-secondary mb-6">The project you're looking for doesn't exist or is still loading.</p>
+//           <button 
+//             onClick={() => router.push('/')}
+//             className="bg-app-accent-purple text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors"
+//           >
+//             Go back to projects
+//           </button>
+//         </motion.div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <>
+//       <Head>
+//         <title>{currentProject?.name || 'Project Detail'} - Canvas App</title>
+//         <meta name="description" content={`Details for ${currentProject?.name} - Canvas App`} />
+//       </Head>
+
+//       <div className="flex flex-col h-screen bg-app-background text-app-text-primary">
+//         {/* Header */}
+//         <Header projectView={true} />
+        
+//         {/* Main content */}
+//         <div className="flex flex-1  relative">
+//           {/* Environment sidebar */}
+//           {/* <EnvironmentSidebar 
+//             selectedEnvironment={selectedEnvironmentId} 
+//             onSelectEnvironment={setSelectedEnvironmentId} 
+//           /> */}
+          
+//           {/* Canvas - Full width and height */}
+//           <div className="flex-1 relative overflow-hidden">
+//             <DraggableCanvas>
+//               {/* Environment boxes */}
+//               {projectEnvironments.map((env, index) => (
+//                 <DeploymentCard
+//                   key={env.id}
+//                   deployment={env}
+//                   position={getDeploymentPosition(index, projectEnvironments.length)}
+//                 />
+//               ))}
+//             </DraggableCanvas>
+            
+//             {/* Empty state when no environments */}
+//             {projectEnvironments.length === 0 && (
+//               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+//                 <motion.div 
+//                   initial={{ opacity: 0, y: 20 }}
+//                   animate={{ opacity: 1, y: 0 }}
+//                   className="bg-app-card border border-app-border rounded-lg p-8 max-w-md text-center pointer-events-auto"
+//                 >
+//                   <div className="inline-flex items-center justify-center h-14 w-14 bg-app-background rounded-full mb-4">
+//                     <FiPlus className="text-app-accent-purple" size={26} />
+//                   </div>
+//                   <h3 className="text-xl font-medium text-app-text-primary mb-2">No environments</h3>
+//                   <p className="text-app-text-secondary mb-6">
+//                     Get started by creating your first environment for this project.
+//                   </p>
+//                   <button 
+//                     onClick={() => setDeployModalOpen(true)}
+//                     className="bg-app-accent-purple text-white px-4 py-2 rounded-md inline-flex items-center"
+//                   >
+//                     <FiPlus className="mr-2" />
+//                     Create Environment
+//                   </button>
+//                 </motion.div>
+//               </div>
+//             )}
+            
+//             {/* Footer Info */}
+//             <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-app-background border-t border-app-border text-app-text-secondary text-sm flex justify-between items-center">
+//               <div className="flex items-center">
+//                 <span className="bg-green-500 h-2 w-2 rounded-full mr-2"></span>
+//                 <span>All systems operational</span>
+//               </div>
+//               <div className="flex items-center">
+//                 <button className="flex items-center hover:text-app-text-primary transition-colors">
+//                   <span className="mr-2">Activity Log</span>
+//                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+//                     <polyline points="18 15 12 9 6 15"></polyline>
+//                   </svg>
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Action buttons */}
+//         <ProjectActionButtons 
+//           onCreateDeployment={() => setDeployModalOpen(true)}
+//         />
+        
+//         {/* Toolbar */}
+//         <CanvasToolbar />
+//       </div>
+
+//       {/* Create Deployment Modal */}
+//       <AnimatePresence>
+//         {deployModalOpen && (
+//           <motion.div
+//             initial={{ opacity: 0 }}
+//             animate={{ opacity: 1 }}
+//             exit={{ opacity: 0 }}
+//             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+//             onClick={() => setDeployModalOpen(false)}
+//           >
+//             <motion.div
+//               initial={{ scale: 0.9, opacity: 0 }}
+//               animate={{ scale: 1, opacity: 1 }}
+//               exit={{ scale: 0.9, opacity: 0 }}
+//               transition={{ type: "spring", duration: 0.5 }}
+//               className="bg-app-card rounded-lg shadow-xl w-full max-w-md p-6"
+//               onClick={e => e.stopPropagation()}
+//             >
+//               <div className="flex justify-between items-center mb-4">
+//                 <h3 className="text-app-text-primary text-xl font-semibold">New Environment</h3>
+//                 <button 
+//                   onClick={() => setDeployModalOpen(false)}
+//                   className="text-app-text-secondary hover:text-app-text-primary transition-colors"
+//                 >
+//                   <FiX size={20} />
+//                 </button>
+//               </div>
+              
+//               <div className="space-y-4">
+//                 <div>
+//                   <label htmlFor="environmentName" className="block text-app-text-secondary text-sm mb-1">Environment Name</label>
+//                   <input 
+//                     type="text" 
+//                     id="environmentName"
+//                     value={newDeploymentName}
+//                     onChange={(e) => setNewDeploymentName(e.target.value)}
+//                     className="w-full bg-app-background border border-app-border rounded-md py-2 px-3 text-app-text-primary focus:outline-none focus:ring-1 focus:ring-app-accent-purple focus:border-app-accent-purple"
+//                     placeholder="E.g. Production"
+//                   />
+//                 </div>
+//                 <div>
+//                   <label htmlFor="environmentType" className="block text-app-text-secondary text-sm mb-1">Environment Type</label>
+//                   <select 
+//                     id="environmentType"
+//                     value={newDeploymentTechnology}
+//                     onChange={(e) => setNewDeploymentTechnology(e.target.value)}
+//                     className="w-full bg-app-background border border-app-border rounded-md py-2 px-3 text-app-text-primary focus:outline-none focus:ring-1 focus:ring-app-accent-purple focus:border-app-accent-purple"
+//                   >
+//                     <option value="Node.js">Development</option>
+//                     <option value="PostgreSQL">Staging</option>
+//                     <option value="React">Production</option>
+//                   </select>
+//                 </div>
+//                 <div>
+//                   <label htmlFor="environmentRegion" className="block text-app-text-secondary text-sm mb-1">Region</label>
+//                   <select 
+//                     id="environmentRegion"
+//                     className="w-full bg-app-background border border-app-border rounded-md py-2 px-3 text-app-text-primary focus:outline-none focus:ring-1 focus:ring-app-accent-purple focus:border-app-accent-purple"
+//                   >
+//                     <option value="us-east">US East</option>
+//                     <option value="us-west">US West</option>
+//                     <option value="eu-central">EU Central</option>
+//                   </select>
+//                 </div>
+//               </div>
+//               <div className="flex justify-end space-x-3 mt-6">
+//                 <button 
+//                   className="px-4 py-2 text-app-text-secondary hover:text-app-text-primary transition-colors"
+//                   onClick={() => setDeployModalOpen(false)}
+//                 >
+//                   Cancel
+//                 </button>
+//                 <button 
+//                   className="px-4 py-2 bg-app-accent-purple text-white rounded-md hover:bg-opacity-90 transition-colors"
+//                   onClick={handleAddDeployment}
+//                   disabled={!newDeploymentName.trim()}
+//                 >
+//                   Create Environment
+//                 </button>
+//               </div>
+//             </motion.div>
+//           </motion.div>
+//         )}
+//       </AnimatePresence>
+//     </>
+//   );
+// }
+
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiPlus, FiMoreVertical, FiTrash2, FiX } from 'react-icons/fi';
+import { FiPlus, FiX } from 'react-icons/fi';
 import DraggableCanvas from '../../components/canvas/DraggableCanvas';
 import Header from '../../components/Header';
 import DeploymentCard from '../../components/canvas/DeploymentCard';
-import EnvironmentSidebar from '../../components/canvas/EnvironmentSidebar';
 import CanvasToolbar from '../../components/canvas/CanvasToolbar';
 import ProjectActionButtons from '../../components/canvas/ProjectActionButtons';
 import { useCanvas } from '../../context/CanvasContext';
@@ -15,35 +293,26 @@ export default function ProjectDetail() {
   const router = useRouter();
   const { id } = router.query;
   const { deployments, selectProject, currentProject, environments, addDeployment, addEnvironment } = useCanvas();
-  const [selectedEnvironmentId, setSelectedEnvironmentId] = useState('dev');
   const [deployModalOpen, setDeployModalOpen] = useState(false);
   const [newDeploymentName, setNewDeploymentName] = useState('');
-  const [newDeploymentTechnology, setNewDeploymentTechnology] = useState('Node.js');
 
-  // Select current project when ID changes
   useEffect(() => {
     if (id) {
       selectProject(id);
+      
+      if (environments.length === 0) {
+        addEnvironment({
+          id: 'default-dev',
+          name: 'Development',
+          color: '#9c5cff'
+        });
+      }
     }
-  }, [id, selectProject]);
+  }, [id, selectProject, environments.length, addEnvironment]);
 
-  // Get all environments for this project
-  const projectEnvironments = environments.map(env => {
-    // Create a deployment-like object for each environment
-    return {
-      id: env.id,
-      name: env.name,
-      environmentId: env.id,
-      projectId: id,
-      status: 'running'
-    };
-  });
-
-  // Handle adding new environment (creating a deployment is now creating an environment)
   const handleAddDeployment = () => {
     if (newDeploymentName.trim() === '') return;
     
-    // First add the environment
     addEnvironment({
       id: newDeploymentName.toLowerCase().replace(/\s+/g, '-'),
       name: newDeploymentName,
@@ -54,37 +323,18 @@ export default function ProjectDetail() {
     setDeployModalOpen(false);
   };
 
-  // Environment box positions - explicitly position each environment
-  const getDeploymentPosition = (index, total) => {
-    // Center of the canvas (using the larger canvas dimensions - see DraggableCanvas)
-    const centerX = 2000; // Center of 4000px canvas
-    const centerY = 1500; // Center of 3000px canvas
-    
-    // If only one environment, place it in the center
-    if (total <= 1) {
-      return { x: centerX, y: centerY };
-    }
-    
-    // For multiple environments, arrange in a horizontal line with spacing
-    const boxWidth = 250; // width + margin between boxes
-    const totalWidth = (total - 1) * boxWidth;
-    const startX = centerX - (totalWidth / 2);
-    
-    return {
-      x: startX + (index * boxWidth),
-      y: centerY
-    };
-  };
+  const projectEnvironments = environments.map(env => ({
+    id: env.id,
+    name: env.name,
+    environmentId: env.id,
+    projectId: id,
+    status: 'running'
+  }));
 
-  // If project not found or not loaded yet
   if (!currentProject) {
     return (
       <div className="flex flex-col h-screen items-center justify-center bg-app-background text-app-text-primary">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
           <div className="mb-4 text-app-text-secondary">
             <svg className="w-16 h-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -110,85 +360,49 @@ export default function ProjectDetail() {
         <meta name="description" content={`Details for ${currentProject?.name} - Canvas App`} />
       </Head>
 
-      <div className="flex flex-col h-screen bg-app-background text-app-text-primary">
-        {/* Header */}
+      <div className="flex flex-col h-screen bg-app-background text-app-text-primary overflow-hidden">
         <Header projectView={true} />
         
-        {/* Main content */}
-        <div className="flex flex-1 mt-16 relative">
-          {/* Environment sidebar */}
-          <EnvironmentSidebar 
-            selectedEnvironment={selectedEnvironmentId} 
-            onSelectEnvironment={setSelectedEnvironmentId} 
-          />
+        <div className="flex-1 relative">
+          <DraggableCanvas>
+            {projectEnvironments.map((env) => (
+              <DeploymentCard
+                key={env.id}
+                deployment={env}
+              />
+            ))}
+          </DraggableCanvas>
           
-          {/* Canvas - Full width and height */}
-          <div className="flex-1 relative overflow-hidden">
-            <DraggableCanvas>
-              {/* Environment boxes */}
-              {projectEnvironments.map((env, index) => (
-                <DeploymentCard
-                  key={env.id}
-                  deployment={env}
-                  position={getDeploymentPosition(index, projectEnvironments.length)}
-                />
-              ))}
-            </DraggableCanvas>
-            
-            {/* Empty state when no environments */}
-            {projectEnvironments.length === 0 && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-app-card border border-app-border rounded-lg p-8 max-w-md text-center pointer-events-auto"
+          {projectEnvironments.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-app-card border border-app-border rounded-lg p-8 max-w-md text-center pointer-events-auto"
+              >
+                <div className="inline-flex items-center justify-center h-14 w-14 bg-app-background rounded-full mb-4">
+                  <FiPlus className="text-app-accent-purple" size={26} />
+                </div>
+                <h3 className="text-xl font-medium text-app-text-primary mb-2">No environments</h3>
+                <p className="text-app-text-secondary mb-6">
+                  Get started by creating your first environment for this project.
+                </p>
+                <button 
+                  onClick={() => setDeployModalOpen(true)}
+                  className="bg-app-accent-purple text-white px-4 py-2 rounded-md inline-flex items-center"
                 >
-                  <div className="inline-flex items-center justify-center h-14 w-14 bg-app-background rounded-full mb-4">
-                    <FiPlus className="text-app-accent-purple" size={26} />
-                  </div>
-                  <h3 className="text-xl font-medium text-app-text-primary mb-2">No environments</h3>
-                  <p className="text-app-text-secondary mb-6">
-                    Get started by creating your first environment for this project.
-                  </p>
-                  <button 
-                    onClick={() => setDeployModalOpen(true)}
-                    className="bg-app-accent-purple text-white px-4 py-2 rounded-md inline-flex items-center"
-                  >
-                    <FiPlus className="mr-2" />
-                    Create Environment
-                  </button>
-                </motion.div>
-              </div>
-            )}
-            
-            {/* Footer Info */}
-            <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-app-background border-t border-app-border text-app-text-secondary text-sm flex justify-between items-center">
-              <div className="flex items-center">
-                <span className="bg-green-500 h-2 w-2 rounded-full mr-2"></span>
-                <span>All systems operational</span>
-              </div>
-              <div className="flex items-center">
-                <button className="flex items-center hover:text-app-text-primary transition-colors">
-                  <span className="mr-2">Activity Log</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="18 15 12 9 6 15"></polyline>
-                  </svg>
+                  <FiPlus className="mr-2" />
+                  Create Environment
                 </button>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Action buttons */}
-        <ProjectActionButtons 
-          onCreateDeployment={() => setDeployModalOpen(true)}
-        />
-        
-        {/* Toolbar */}
+        <ProjectActionButtons onCreateDeployment={() => setDeployModalOpen(true)} />
         <CanvasToolbar />
       </div>
 
-      {/* Create Deployment Modal */}
       <AnimatePresence>
         {deployModalOpen && (
           <motion.div
@@ -227,30 +441,6 @@ export default function ProjectDetail() {
                     className="w-full bg-app-background border border-app-border rounded-md py-2 px-3 text-app-text-primary focus:outline-none focus:ring-1 focus:ring-app-accent-purple focus:border-app-accent-purple"
                     placeholder="E.g. Production"
                   />
-                </div>
-                <div>
-                  <label htmlFor="environmentType" className="block text-app-text-secondary text-sm mb-1">Environment Type</label>
-                  <select 
-                    id="environmentType"
-                    value={newDeploymentTechnology}
-                    onChange={(e) => setNewDeploymentTechnology(e.target.value)}
-                    className="w-full bg-app-background border border-app-border rounded-md py-2 px-3 text-app-text-primary focus:outline-none focus:ring-1 focus:ring-app-accent-purple focus:border-app-accent-purple"
-                  >
-                    <option value="Node.js">Development</option>
-                    <option value="PostgreSQL">Staging</option>
-                    <option value="React">Production</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="environmentRegion" className="block text-app-text-secondary text-sm mb-1">Region</label>
-                  <select 
-                    id="environmentRegion"
-                    className="w-full bg-app-background border border-app-border rounded-md py-2 px-3 text-app-text-primary focus:outline-none focus:ring-1 focus:ring-app-accent-purple focus:border-app-accent-purple"
-                  >
-                    <option value="us-east">US East</option>
-                    <option value="us-west">US West</option>
-                    <option value="eu-central">EU Central</option>
-                  </select>
                 </div>
               </div>
               <div className="flex justify-end space-x-3 mt-6">
