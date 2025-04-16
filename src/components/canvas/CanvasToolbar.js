@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { FiPlus, FiRefreshCw } from 'react-icons/fi';
 
-const CanvasToolbar = () => {
+const CanvasToolbar = ({setDeployModalOpen}) => {
   return (
     <div className="absolute bottom-6 right-6 z-30">
       <div className="flex flex-col space-y-3">
@@ -17,6 +17,7 @@ const CanvasToolbar = () => {
         
         {/* Create button */}
         <motion.button
+          onClick={(e) => setDeployModalOpen(true)}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="bg-app-accent-purple text-white p-3 rounded-md shadow-md hover:bg-opacity-90 transition-all duration-300 flex items-center justify-center"
