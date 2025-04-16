@@ -18,12 +18,12 @@ export default function Home() {
   // Create new project
   const handleCreateProject = () => {
     if (newProjectName.trim() === '') return;
-    
+
     addProject({
       name: newProjectName,
       description: newProjectDescription,
     });
-    
+
     setNewProjectName('');
     setNewProjectDescription('');
     setCreateModalOpen(false);
@@ -64,16 +64,16 @@ export default function Home() {
               <h1 className="text-xl font-medium text-app-text-primary mb-2 sm:mb-0">
                 Projects <span className="text-app-text-secondary text-sm font-normal">({projects.length})</span>
               </h1>
-              
+
               <div className="flex space-x-2">
-                <button 
+                <button
                   onClick={() => setFilterOpen(!filterOpen)}
                   className="flex items-center text-app-text-secondary border border-app-border rounded-md px-3 py-1.5 hover:bg-app-card-hover transition-colors"
                 >
                   <FiFilter className="mr-2" size={14} />
                   <span className="text-sm">Filter</span>
                 </button>
-                
+
                 <div className="relative">
                   <button className="flex items-center text-app-text-secondary border border-app-border rounded-md px-3 py-1.5 hover:bg-app-card-hover transition-colors">
                     <FiClock className="mr-2" size={14} />
@@ -85,14 +85,14 @@ export default function Home() {
 
             <div className="flex items-center space-x-2 w-full sm:w-auto">
               <div className="bg-app-card border border-app-border rounded-md overflow-hidden flex">
-                <button 
+                <button
                   className={`p-2 ${viewType === 'grid' ? 'bg-app-accent-purple text-white' : 'text-app-text-secondary'}`}
                   onClick={() => setViewType('grid')}
                   aria-label="Grid view"
                 >
                   <FiGrid size={18} />
                 </button>
-                <button 
+                <button
                   className={`p-2 ${viewType === 'list' ? 'bg-app-accent-purple text-white' : 'text-app-text-secondary'}`}
                   onClick={() => setViewType('list')}
                   aria-label="List view"
@@ -100,23 +100,24 @@ export default function Home() {
                   <FiList size={18} />
                 </button>
               </div>
+              <Link href={`/new-project`}>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setCreateModalOpen(true)}
-                className="bg-app-accent-purple text-white px-4 py-2 rounded-md flex items-center whitespace-nowrap"
-              >
-                <FiPlus className="mr-2" size={18} />
-                <span>New Project</span>
-              </motion.button>
+                  className="bg-app-accent-purple text-white px-4 py-2 rounded-md flex items-center whitespace-nowrap"
+                >
+                  <FiPlus className="mr-2" size={18} />
+                  <span>New Project</span>
+                </motion.button>
+              </Link>
             </div>
           </div>
-          
+
           {/* Filter bar - conditionally shown */}
           <AnimatePresence>
             {filterOpen && (
-              <motion.div 
+              <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
@@ -126,7 +127,7 @@ export default function Home() {
                 <div className="bg-app-card border border-app-border rounded-lg p-4">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="font-medium text-app-text-primary">Filter Projects</h3>
-                    <button 
+                    <button
                       onClick={() => setFilterOpen(false)}
                       className="text-app-text-secondary hover:text-app-text-primary transition-colors"
                     >
@@ -176,7 +177,7 @@ export default function Home() {
 
           {/* Empty state when no projects */}
           {projects.length === 0 ? (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-app-card border border-app-border rounded-lg p-10 text-center"
@@ -188,7 +189,7 @@ export default function Home() {
               <p className="text-app-text-secondary mb-6 max-w-md mx-auto">
                 Create your first project to get started. Projects help you organize your deployments and environments.
               </p>
-              <button 
+              <button
                 onClick={() => setCreateModalOpen(true)}
                 className="bg-app-accent-purple text-white px-4 py-2 rounded-md inline-flex items-center"
               >
@@ -198,15 +199,14 @@ export default function Home() {
             </motion.div>
           ) : (
             /* Projects grid or list */
-            <motion.div 
+            <motion.div
               variants={container}
               initial="hidden"
               animate="show"
-              className={`${
-                viewType === 'grid' 
-                  ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' 
+              className={`${viewType === 'grid'
+                  ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
                   : 'space-y-4'
-              }`}
+                }`}
             >
               {projects.map((project) => (
                 <motion.div key={project.id} variants={item}>
@@ -238,19 +238,19 @@ export default function Home() {
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-app-text-primary text-xl font-semibold">Create New Project</h3>
-                <button 
+                <button
                   onClick={() => setCreateModalOpen(false)}
                   className="text-app-text-secondary hover:text-app-text-primary transition-colors"
                 >
                   <FiX size={20} />
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 <div>
                   <label htmlFor="projectName" className="block text-app-text-secondary text-sm mb-1">Project Name</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     id="projectName"
                     value={newProjectName}
                     onChange={(e) => setNewProjectName(e.target.value)}
@@ -260,8 +260,8 @@ export default function Home() {
                 </div>
                 <div>
                   <label htmlFor="projectDescription" className="block text-app-text-secondary text-sm mb-1">Description</label>
-                  <textarea 
-                    id="projectDescription" 
+                  <textarea
+                    id="projectDescription"
                     rows="3"
                     value={newProjectDescription}
                     onChange={(e) => setNewProjectDescription(e.target.value)}
@@ -271,13 +271,13 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex justify-end space-x-3 mt-6">
-                <button 
+                <button
                   className="px-4 py-2 text-app-text-secondary hover:text-app-text-primary transition-colors"
                   onClick={() => setCreateModalOpen(false)}
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   className="px-4 py-2 bg-app-accent-purple text-white rounded-md hover:bg-opacity-90 transition-colors"
                   onClick={handleCreateProject}
                   disabled={!newProjectName.trim()}
